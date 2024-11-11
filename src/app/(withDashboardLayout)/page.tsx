@@ -4,9 +4,8 @@
 import NoteCard from "@/components/NoteCard/NoteCard";
 import { NoteFormWithVanishEffect } from "@/components/ui/NoteFormWithVanishEffect/NoteFormWithVanishEffect";
 import { motion } from "framer-motion";
-import { IoCheckmarkCircleOutline } from "react-icons/io5";
+import { IoCheckmarkCircleOutline, IoSearchSharp } from "react-icons/io5";
 import { toast, Toaster } from "sonner";
-import Swal from "sweetalert2";
 
 const page = () => {
   const placeholders = [
@@ -43,20 +42,22 @@ const page = () => {
   return (
     <div className="">
       <Toaster position="top-right" duration={3000} />
-      <div className=" px-2 pt-3 md:pt-10 pb-5">
+
+      <div className="pt-5 px-2  w-full ">
+        <div className=" relative max-w-2xl mx-auto">
+          <input className="w-full relative  ps-5 pr-10 mx-auto rounded-full bg-white dark:bg-neutral-900 h-10 border-b-1 border-neutral-200 dark:border-neutral-700 overflow-hidden shadow transition duration-200 " />
+          <IoSearchSharp size={20} className="absolute right-4 bottom-[11px] text-neutral-600 dark:text-neutral-500 cursor-pointer" />
+        </div>
+      </div>
+      <div className=" px-2 pt-3 md:pt-5 pb-5 ">
         <NoteFormWithVanishEffect
           placeholders={placeholders}
           placeholdersForTextArea={placeholdersForTextArea}
           onChange={handleChange}
           onSubmit={handleSubmit}
         />
-        {/* <SearchWithVanishEffect
-        placeholders={placeholders}
-        onChange={handleChange}
-        onSubmit={handleSubmit}
-      /> */}
       </div>
-    
+
       <div className="flex flex-1 w-full group h-full">
         <div className="p-2 md:p-10 rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 flex flex-col gap-2 flex-1 w-full h-full">
           <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">

@@ -90,7 +90,7 @@ export default function SidebarDemo({
           </div>
         </SidebarBody>
       </Sidebar>
-      <div className="w-full h-full overflow-hidden overflow-y-auto slim-scroll">
+      <div className="w-full h-full overflow-hidden overflow-y-auto md:slim-scroll">
         {children}
       </div>
     </div>

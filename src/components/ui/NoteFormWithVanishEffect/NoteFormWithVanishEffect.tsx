@@ -1,9 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { cn } from "@/lib/utils";
+import { GrGallery } from "react-icons/gr";
+import { IoPersonAddOutline } from "react-icons/io5";
+import { MdPersonAddAlt } from "react-icons/md";
+import FileUploadDropzone from "../FileUploadDropzone/FileUploadDropzone";
 
 export function NoteFormWithVanishEffect({
   placeholders,
@@ -65,11 +69,10 @@ console.log({opacityDuration});
       setOpacity(0);
       setTimeout(() => {
         setOpacityDuration(false); 
-      }, 200); 
+      }, 400); 
     } else {
       setOpacity(1);
         setOpacityDuration(true);
-     
     }
   }, [inputValue]);
   
@@ -448,7 +451,7 @@ console.log({opacityDuration});
               value={textAreaValue}
               rows={2} // Minimum rows
               className={cn(
-                "w-full relative text-sm sm:text-base z-50 border-none dark:text-white bg-transparent text-black  focus:outline-none focus:ring-0 pl-4 pt-4 mb-2 sm:pl-10 pr-20 resize-none overflow-hidden",
+                "w-full relative text-sm sm:text-base z-50 border-none dark:text-white bg-transparent text-black  focus:outline-none focus:ring-0 pl-4 pt-4 mb-10 sm:pl-10 pr-20 resize-none overflow-hidden",
                 animatingTextArea && "text-transparent dark:text-transparent"
               )}
               style={{
@@ -490,7 +493,10 @@ console.log({opacityDuration});
                 <path d="M13 6l6 6" />
               </motion.svg>
             </button>
-
+            <div className="absolute bottom-2 left-10 flex items-center gap-7">
+           <FileUploadDropzone/>
+            <MdPersonAddAlt size={22}  className="cursor-pointer"/>
+      </div>
             {/* Placeholder Animation for Text Area */}
             <div className="absolute inset-0 flex items-start pt-4 rounded-full pointer-events-none">
               <AnimatePresence mode="wait">
