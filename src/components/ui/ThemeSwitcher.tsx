@@ -11,7 +11,6 @@ export function ThemeSwitcher() {
 
   useEffect(() => {
     setMounted(true);
-    setTheme("dark")
   }, []);
 
   // if(!mounted) return <Switch/>
