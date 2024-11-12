@@ -4,8 +4,6 @@
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { GrGallery } from "react-icons/gr";
-import { IoPersonAddOutline } from "react-icons/io5";
 import { MdPersonAddAlt } from "react-icons/md";
 import FileUploadDropzone from "../FileUploadDropzone/FileUploadDropzone";
 

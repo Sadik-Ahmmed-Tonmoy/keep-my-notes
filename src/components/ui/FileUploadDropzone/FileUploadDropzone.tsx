@@ -6,7 +6,6 @@
 //   FileUploaderContent,
 //   FileUploaderItem,
 // } from '@/components/file-upload';
-import { Paperclip, Upload } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
 import { DropzoneOptions } from 'react-dropzone';
@@ -19,7 +18,7 @@ import { GrGallery } from 'react-icons/gr';
 
 const FileUploadDropzone = () => {
   const [files, setFiles] = useState<File[] | null>([]);
-  const [message, setMessage] = useState('');
+
 
   const dropzone = {
     accept: {

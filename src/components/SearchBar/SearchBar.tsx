@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useEffect, useRef, useState } from "react";
-import MyFormWrapper from "../ui/MyForm/MyFormWrapper/MyFormWrapper";
-import MyFormInputAceternity from "../ui/MyForm/MyFormInputAceternity/MyFormInputAceternity";
-import { IoSearchSharp } from "react-icons/io5";
 import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { IoSearchSharp } from "react-icons/io5";
+import MyFormInputAceternity from "../ui/MyForm/MyFormInputAceternity/MyFormInputAceternity";
+import MyFormWrapper from "../ui/MyForm/MyFormWrapper/MyFormWrapper";
 
 const placeholdersForSearchBar = [
     "Search your notes...",
@@ -14,8 +14,8 @@ const placeholdersForSearchBar = [
     "Browse through your saved notes...",
     "Quickly access your saved ideas...",
   ];
+ 
   
-
 const SearchBar = () => {
   const [currentPlaceholderForSearchArea, setCurrentPlaceholderForSearchArea] =
     useState(0);

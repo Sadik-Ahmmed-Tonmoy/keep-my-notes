@@ -3,14 +3,11 @@
 
 import NoteCard from "@/components/NoteCard/NoteCard";
 import SearchBar from "@/components/SearchBar/SearchBar";
-import MyFormInputAceternity from "@/components/ui/MyForm/MyFormInputAceternity/MyFormInputAceternity";
-import MyFormWrapper from "@/components/ui/MyForm/MyFormWrapper/MyFormWrapper";
 import { NoteFormWithVanishEffect } from "@/components/ui/NoteFormWithVanishEffect/NoteFormWithVanishEffect";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { IoCheckmarkCircleOutline, IoSearchSharp } from "react-icons/io5";
+import { IoCheckmarkCircleOutline } from "react-icons/io5";
 import { toast, Toaster } from "sonner";
+
 
 const MainPage = () => {
   const placeholders = [
