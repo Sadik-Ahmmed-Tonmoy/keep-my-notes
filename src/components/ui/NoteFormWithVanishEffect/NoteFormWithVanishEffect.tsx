@@ -62,7 +62,7 @@ export function PlaceholdersAndVanishInput({
   const [isAnimationRunning, setIsAnimationRunning] = useState(false);
   const [opacity, setOpacity] = useState(0);
   const [opacityDuration, setOpacityDuration] = useState(false);
-console.log({opacityDuration});
+
   useEffect(() => {
 
     if (inputValue.length < 1) {
