@@ -13,6 +13,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { Sidebar, SidebarBody, SidebarLink } from "../ui/sidebar";
 import { ThemeSwitcher } from "../ui/ThemeSwitcher";
+import { Button, Layout, Menu, theme } from "antd";
+import {
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  UploadOutlined,
+  UserOutlined,
+  VideoCameraOutlined,
+} from "@ant-design/icons";
+
+const { Header, Sider, Content } = Layout;
 
 export default function SidebarDemo({
   children,
@@ -58,17 +68,38 @@ export default function SidebarDemo({
         "h-screen w-full overflow-hidden" // for your use case, use `h-screen` instead of `h-[60vh]`
       )}
     >
-      <Sidebar open={open} setOpen={setOpen} >
+      <div className=" bg-red-500 overflow-hidden ">
+      <Sidebar open={open} setOpen={setOpen}>
         <SidebarBody className="justify-between gap-10">
-          <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-            {open ? <Logo /> : <LogoIcon />}
-            <div className="mt-8 flex flex-col gap-2">
-              {links.map((link, idx) => (
-                <SidebarLink key={idx} link={link} />
-              ))}
-            </div>
-          </div>
-          <div>
+          <Sider trigger={null} collapsible collapsed={!open}>
+         
+            <Menu
+              // theme="light"
+              className="bgtra"
+              mode="inline"
+              defaultSelectedKeys={["1"]}
+              items={[
+                {
+                  key: "1",
+                  icon: <UserOutlined />,
+                  label: "nav 1",
+                  children: [
+                    {
+                      key: "2",
+                      icon: <VideoCameraOutlined />,
+                      label: "nav 2",
+                    },
+                  ],
+                },
+                {
+                  key: "3",
+                  icon: <UploadOutlined />,
+                  label: "nav 3",
+                },
+              ]}
+            />
+          </Sider>
+          <div className=" px-6">
             <div>
               <ThemeSwitcher />
             </div>
@@ -90,6 +121,8 @@ export default function SidebarDemo({
           </div>
         </SidebarBody>
       </Sidebar>
+
+      </div>
       <div className="w-full h-full overflow-hidden overflow-y-auto md:slim-scroll">
         {children}
       </div>
@@ -123,4 +156,3 @@ export const LogoIcon = () => {
     </Link>
   );
 };
-
