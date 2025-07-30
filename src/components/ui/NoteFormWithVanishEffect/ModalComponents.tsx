@@ -1,25 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React from "react";
-import { message, Form, Input, Select, DatePicker, Tag, Space, List, Button as AntButton, Popconfirm } from "antd";
 import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
+    Modal,
+    ModalBody,
+    ModalContent,
+    ModalHeader,
 } from "@heroui/react";
 import {
-  IconX,
-  IconDownload,
-  IconEdit,
-  IconEye,
-  IconHeart,
-  IconStar,
-  IconArchive,
-  IconTrash,
+    IconArchive,
+    IconDownload,
+    IconEdit,
+    IconEye,
+    IconHeart,
+    IconStar,
+    IconTrash,
+    IconX,
 } from "@tabler/icons-react";
-import { Tooltip } from "antd";
+import { Button as AntButton, DatePicker, Form, Input, List, Popconfirm, Select, Space, Tag, Tooltip } from "antd";
+import React from "react";
 
 interface FileItem {
   id: string;
@@ -175,7 +174,7 @@ interface FileListModalProps {
   onClose: () => void;
   title: string;
   files: FileItem[];
-  fileActions: FileActionsProps;
+  fileActions: any
 }
 
 export const FileListModal: React.FC<FileListModalProps> = ({
@@ -251,7 +250,7 @@ interface SharedFilesModalProps {
   isOpen: boolean;
   onClose: () => void;
   files: FileItem[];
-  fileActions: FileActionsProps;
+  fileActions: any;
 }
 
 export const SharedFilesModal: React.FC<SharedFilesModalProps> = ({

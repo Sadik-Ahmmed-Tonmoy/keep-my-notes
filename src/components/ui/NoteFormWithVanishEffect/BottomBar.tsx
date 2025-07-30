@@ -130,33 +130,33 @@ export default function BottomBar({ inputValue }: { inputValue: string }) {
   const [categories] = React.useState(["Documents", "Finance", "Reports", "Projects", "Marketing", "HR", "Legal", "Operations"]);
 
   // File operations
-  const toggleFavorite = (fileId: string) => {
-    setFiles((prev) => prev.map((file) => (file.id === fileId ? { ...file, isFavorite: !file.isFavorite } : file)));
+  const toggleFavorite = (file: FileItem) => {
+    setFiles((prev) => prev.map((f) => (f.id === file.id ? { ...f, isFavorite: !f.isFavorite } : f)));
     message.success("File favorite status updated");
   };
 
-  const toggleStar = (fileId: string) => {
-    setFiles((prev) => prev.map((file) => (file.id === fileId ? { ...file, isStarred: !file.isStarred } : file)));
+  const toggleStar = (file: FileItem) => {
+    setFiles((prev) => prev.map((f) => (f.id === file.id ? { ...f, isStarred: !f.isStarred } : f)));
     message.success("File star status updated");
   };
 
-  const moveToTrash = (fileId: string) => {
-    setFiles((prev) => prev.map((file) => (file.id === fileId ? { ...file, isDeleted: true } : file)));
+  const moveToTrash = (file: FileItem) => {
+    setFiles((prev) => prev.map((f) => (f.id === file.id ? { ...f, isDeleted: true } : f)));
     message.success("File moved to trash");
   };
 
-  const restoreFile = (fileId: string) => {
-    setFiles((prev) => prev.map((file) => (file.id === fileId ? { ...file, isDeleted: false } : file)));
+  const restoreFile = (file: FileItem) => {
+    setFiles((prev) => prev.map((f) => (f.id === file.id ? { ...f, isDeleted: false } : f)));
     message.success("File restored");
   };
 
-  const deleteFilePermanently = (fileId: string) => {
-    setFiles((prev) => prev.filter((file) => file.id !== fileId));
+  const deleteFilePermanently = (file: FileItem) => {
+    setFiles((prev) => prev.filter((f) => f.id !== file.id));
     message.success("File permanently deleted");
   };
 
-  const archiveFile = (fileId: string) => {
-    setFiles((prev) => prev.map((file) => (file.id === fileId ? { ...file, isArchived: !file.isArchived } : file)));
+  const archiveFile = (file: FileItem) => {
+    setFiles((prev) => prev.map((f) => (f.id === file.id ? { ...f, isArchived: !f.isArchived } : f)));
     message.success("File archive status updated");
   };
 

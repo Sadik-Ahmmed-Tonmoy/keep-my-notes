@@ -4,10 +4,7 @@
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { MdPersonAddAlt, MdClose } from "react-icons/md";
-import FileUploadDropzone from "../FileUploadDropzone/FileUploadDropzone";
-import { IconArchive, IconCategory, IconFolder, IconHeart, IconHistory, IconShare, IconStar, IconTrash } from "@tabler/icons-react";
-import { Tooltip } from "antd";
+import { MdClose } from "react-icons/md";
 import BottomBar from "./BottomBar";
 
 export function NoteFormWithVanishEffect({
@@ -89,15 +86,15 @@ export function PlaceholdersAndVanishInput({
   }, [inputValue]);
 
   // Handle image file uploads
-  const handleImageUpload = useCallback((files: File[]) => {
-    const imageFiles = files.filter((file) => file.type.startsWith("image/"));
+  // const handleImageUpload = useCallback((files: File[]) => {
+  //   const imageFiles = files.filter((file) => file.type.startsWith("image/"));
 
-    // Create preview URLs
-    const newPreviews = imageFiles.map((file) => URL.createObjectURL(file));
+  //   // Create preview URLs
+  //   const newPreviews = imageFiles.map((file) => URL.createObjectURL(file));
 
-    setAttachedImages((prev) => [...prev, ...imageFiles]);
-    setImagePreviews((prev) => [...prev, ...newPreviews]);
-  }, []);
+  //   setAttachedImages((prev) => [...prev, ...imageFiles]);
+  //   setImagePreviews((prev) => [...prev, ...newPreviews]);
+  // }, []);
 
   // Remove image
   const removeImage = useCallback(
