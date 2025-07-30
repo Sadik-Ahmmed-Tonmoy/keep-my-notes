@@ -4,8 +4,11 @@
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { MdPersonAddAlt } from "react-icons/md";
+import { MdPersonAddAlt, MdClose } from "react-icons/md";
 import FileUploadDropzone from "../FileUploadDropzone/FileUploadDropzone";
+import { IconArchive, IconCategory, IconFolder, IconHeart, IconHistory, IconShare, IconStar, IconTrash } from "@tabler/icons-react";
+import { Tooltip } from "antd";
+import BottomBar from "./BottomBar";
 
 export function NoteFormWithVanishEffect({
   placeholders,
@@ -18,7 +21,11 @@ export function NoteFormWithVanishEffect({
   onChange: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
-  onSubmit: (values: { inputValue: string; textAreaValue: string }) => void;
+  onSubmit: (values: {
+    inputValue: string;
+    textAreaValue: string;
+    attachedImages?: File[];
+  }) => void;
 }) {
   return (
     <PlaceholdersAndVanishInput
@@ -41,7 +48,11 @@ export function PlaceholdersAndVanishInput({
   onChange: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
-  onSubmit: (values: { inputValue: string; textAreaValue: string }) => void;
+  onSubmit: (values: {
+    inputValue: string;
+    textAreaValue: string;
+    attachedImages?: File[];
+  }) => void;
 }) {
   const [currentPlaceholder, setCurrentPlaceholder] = useState(0);
   const [currentPlaceholderForTextArea, setCurrentPlaceholderForTextArea] =
@@ -61,25 +72,58 @@ export function PlaceholdersAndVanishInput({
   const [opacity, setOpacity] = useState(0);
   const [opacityDuration, setOpacityDuration] = useState(false);
 
-  useEffect(() => {
+  // Image handling state
+  const [attachedImages, setAttachedImages] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
+  useEffect(() => {
     if (inputValue.length < 1) {
       setOpacity(0);
       setTimeout(() => {
-        setOpacityDuration(false); 
-      }, 400); 
+        setOpacityDuration(false);
+      }, 400);
     } else {
       setOpacity(1);
-        setOpacityDuration(true);
+      setOpacityDuration(true);
     }
   }, [inputValue]);
-  
+
+  // Handle image file uploads
+  const handleImageUpload = useCallback((files: File[]) => {
+    const imageFiles = files.filter((file) => file.type.startsWith("image/"));
+
+    // Create preview URLs
+    const newPreviews = imageFiles.map((file) => URL.createObjectURL(file));
+
+    setAttachedImages((prev) => [...prev, ...imageFiles]);
+    setImagePreviews((prev) => [...prev, ...newPreviews]);
+  }, []);
+
+  // Remove image
+  const removeImage = useCallback(
+    (index: number) => {
+      // Revoke the object URL to prevent memory leaks
+      URL.revokeObjectURL(imagePreviews[index]);
+
+      setAttachedImages((prev) => prev.filter((_, i) => i !== index));
+      setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+    },
+    [imagePreviews]
+  );
+
+  // Clean up object URLs on unmount
+  useEffect(() => {
+    return () => {
+      imagePreviews.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [imagePreviews]);
 
   const startAnimation = () => {
     intervalRef.current = setInterval(() => {
       setCurrentPlaceholder((prev) => (prev + 1) % placeholders.length);
     }, 3000);
   };
+
   const startAnimationForTextArea = () => {
     intervalRef.current = setInterval(() => {
       setCurrentPlaceholderForTextArea(
@@ -87,12 +131,13 @@ export function PlaceholdersAndVanishInput({
       );
     }, 3000);
   };
+
   const handleVisibilityChange = () => {
     if (document.visibilityState !== "visible" && intervalRef.current) {
-      clearInterval(intervalRef.current); // Clear the interval when the tab is not visible
+      clearInterval(intervalRef.current);
       intervalRef.current = null;
     } else if (document.visibilityState === "visible") {
-      startAnimation(); // Restart the interval when the tab becomes visible
+      startAnimation();
       startAnimationForTextArea();
     }
   };
@@ -249,16 +294,22 @@ export function PlaceholdersAndVanishInput({
       onSubmit({
         inputValue,
         textAreaValue,
+        attachedImages: attachedImages.length > 0 ? attachedImages : undefined,
       });
     }
 
-    // Reset the textarea height after submission
+    // Reset form state
     if (textAreaRef.current) {
-      textAreaRef.current.style.height = "auto"; // Reset height to default
+      textAreaRef.current.style.height = "auto";
     }
 
     setTextAreaValue("");
     setOpacity(0);
+
+    // Clear images after submission
+    imagePreviews.forEach((url) => URL.revokeObjectURL(url));
+    setAttachedImages([]);
+    setImagePreviews([]);
   };
 
   const animate = (start: number) => {
@@ -378,7 +429,6 @@ export function PlaceholdersAndVanishInput({
               }
             }
           }}
-          // onKeyDown={handleKeyDown}
           ref={inputRef}
           value={inputValue}
           type="text"
@@ -407,114 +457,109 @@ export function PlaceholdersAndVanishInput({
         </div>
       </div>
 
-      {/* Text Area */}
-      <>
+      {/* Image Previews */}
+      {imagePreviews.length > 0 && (
         <motion.div
-          initial={{ opacity: 0, y: 50 }} // Start off-screen below
-          animate={{ opacity: opacity, y: opacity ? 0 : 50 }} // Toggle opacity
-          exit={{ opacity: 0, y: 50 }} // Exit animation
-          transition={{
-            duration: 0.3,
-            delay: 0.1,
-          }}
-          className={cn(
-            "w-full relative max-w-5xl mx-auto bg-white dark:bg-neutral-900 h-full overflow-hidden shadow transition duration-200 mb-2",
-            textAreaValue && "bg-gray-50 ",
-            opacityDuration  ? "block" : "hidden"
-          )}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full max-w-5xl mx-auto mt-2 mb-2"
         >
-          <div>
-            <canvas
-              className={cn(
-                "absolute pointer-events-none transform scale-50 top-0 left-2 sm:left-8 origin-top-left filter invert dark:invert-0 pr-20",
-                !animatingTextArea ? "opacity-0" : "opacity-100"
-              )}
-              // ref={canvasRefForTextArea}
-            />
-            <textarea
-              onChange={(e) => {
-                if (!animatingTextArea) {
-                  setTextAreaValue(e.target.value);
-                  if (onChange) {
-                    onChange(e);
-                  }
-                }
-              }}
-              onInput={(e) => {
-                const target = e.target as HTMLTextAreaElement;
-                target.style.height = "auto"; // Reset height to recalculate
-                target.style.height = `${Math.min(target.scrollHeight, 800)}px`; // Set height to scrollHeight, with a max
-              }}
-              ref={textAreaRef}
-              value={textAreaValue}
-              rows={2} // Minimum rows
-              className={cn(
-                "w-full relative text-sm sm:text-base z-50 border-none dark:text-white bg-transparent text-black  focus:outline-none focus:ring-0 pl-4 pt-4 mb-10 sm:pl-10 pr-20 resize-none overflow-hidden",
-                animatingTextArea && "text-transparent dark:text-transparent"
-              )}
-              style={{
-                height: "auto",
-                minHeight: "3rem", // Ensures a minimum height
-                maxHeight: "100%", // Set maximum height constraint
-              }}
-            />
-
-            {/* Submit Button */}
-            <button
-              disabled={!inputValue}
-              type="submit"
-              className="absolute right-2 bottom-4 z-50 h-8 w-8 rounded-full disabled:bg-gray-100 bg-black dark:bg-zinc-900 dark:disabled:bg-zinc-800 transition duration-200 flex items-center justify-center"
-            >
-              <motion.svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="text-gray-300 h-4 w-4"
-              >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                <motion.path
-                  d="M5 12l14 0"
-                  initial={{
-                    strokeDasharray: "50%",
-                    strokeDashoffset: "50%",
-                  }}
-                  animate={{ strokeDashoffset: inputValue ? 0 : "50%" }}
-                  transition={{ duration: 0.3, ease: "linear" }}
+          <div className="flex flex-wrap gap-2 p-2 bg-gray-50 dark:bg-neutral-800 rounded-lg">
+            {imagePreviews.map((preview, index) => (
+              <div key={index} className="relative group">
+                <img
+                  src={preview}
+                  alt={`Preview ${index + 1}`}
+                  className="w-16 h-16 object-cover rounded-md border-2 border-gray-200 dark:border-neutral-600"
                 />
-                <path d="M13 18l6 -6" />
-                <path d="M13 6l6 6" />
-              </motion.svg>
-            </button>
-            <div className="absolute bottom-2 left-10 flex items-center gap-7">
-           <FileUploadDropzone/>
-            <MdPersonAddAlt size={22}  className="cursor-pointer"/>
-      </div>
-            {/* Placeholder Animation for Text Area */}
-            <div className="absolute inset-0 flex items-start pt-4 rounded-full pointer-events-none">
-              <AnimatePresence mode="wait">
-                {!textAreaValue && (
-                  <motion.p
-                    initial={{ y: 5, opacity: 0 }}
-                    key={`current-placeholder-${currentPlaceholderForTextArea}`}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: -15, opacity: 0 }}
-                    transition={{ duration: 0.3, ease: "linear" }}
-                    className="dark:text-zinc-500 text-sm sm:text-base font-normal text-neutral-500 pl-4 sm:pl-12 text-left w-[calc(100%-2rem)] truncate"
-                  >
-                    {placeholdersForTextArea[currentPlaceholderForTextArea]}
-                  </motion.p>
-                )}
-              </AnimatePresence>
-            </div>
+                <button
+                  type="button"
+                  onClick={() => removeImage(index)}
+                  className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <MdClose size={12} />
+                </button>
+              </div>
+            ))}
           </div>
         </motion.div>
-      </>
+      )}
+
+      {/* Text Area */}
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: opacity, y: opacity ? 0 : 50 }}
+        exit={{ opacity: 0, y: 50 }}
+        transition={{
+          duration: 0.3,
+          delay: 0.1,
+        }}
+        className={cn(
+          "w-full relative max-w-5xl mx-auto bg-white dark:bg-neutral-900 h-full overflow-hidden shadow transition duration-200 mb-2",
+          textAreaValue && "bg-gray-50",
+          opacityDuration ? "block" : "hidden"
+        )}
+      >
+        <div>
+          <canvas
+            className={cn(
+              "absolute pointer-events-none transform scale-50 top-0 left-2 sm:left-8 origin-top-left filter invert dark:invert-0 pr-20",
+              !animatingTextArea ? "opacity-0" : "opacity-100"
+            )}
+            ref={canvasRefForTextArea}
+          />
+          <textarea
+            onChange={(e) => {
+              if (!animatingTextArea) {
+                setTextAreaValue(e.target.value);
+                if (onChange) {
+                  onChange(e);
+                }
+              }
+            }}
+            onInput={(e) => {
+              const target = e.target as HTMLTextAreaElement;
+              target.style.height = "auto";
+              target.style.height = `${Math.min(target.scrollHeight, 800)}px`;
+            }}
+            ref={textAreaRef}
+            value={textAreaValue}
+            rows={2}
+            className={cn(
+              "w-full relative text-sm sm:text-base z-50 border-none dark:text-white bg-transparent text-black focus:outline-none focus:ring-0 pl-4 pt-4 mb-10 sm:pl-10 pr-20 resize-none overflow-hidden",
+              animatingTextArea && "text-transparent dark:text-transparent"
+            )}
+            style={{
+              height: "auto",
+              minHeight: "3rem",
+              maxHeight: "100%",
+            }}
+          />
+
+    
+          <BottomBar inputValue={inputValue} />
+  
+
+
+          {/* Placeholder Animation for Text Area */}
+          <div className="absolute inset-0 flex items-start pt-4 rounded-full pointer-events-none">
+            <AnimatePresence mode="wait">
+              {!textAreaValue && (
+                <motion.p
+                  initial={{ y: 5, opacity: 0 }}
+                  key={`current-placeholder-${currentPlaceholderForTextArea}`}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: -15, opacity: 0 }}
+                  transition={{ duration: 0.3, ease: "linear" }}
+                  className="dark:text-zinc-500 text-sm sm:text-base font-normal text-neutral-500 pl-4 sm:pl-12 text-left w-[calc(100%-2rem)] truncate"
+                >
+                  {placeholdersForTextArea[currentPlaceholderForTextArea]}
+                </motion.p>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+      </motion.div>
     </form>
   );
 }

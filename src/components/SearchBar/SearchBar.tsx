@@ -4,18 +4,21 @@ import { useEffect, useRef, useState } from "react";
 import { IoSearchSharp } from "react-icons/io5";
 import MyFormInputAceternity from "../ui/MyForm/MyFormInputAceternity/MyFormInputAceternity";
 import MyFormWrapper from "../ui/MyForm/MyFormWrapper/MyFormWrapper";
+import blackLogo from "@/assets/logo/blackLogo.png";
+import whiteLogo from "@/assets/logo/whiteLogo.png";
+import { useTheme } from "next-themes";
+import Image from "next/image";
 
 const placeholdersForSearchBar = [
-    "Search your notes...",
-    "Looking for something specific?",
-    "Type keywords to find notes...",
-    "Filter notes by title or content...",
-    "Find a note by topic or keyword...",
-    "Browse through your saved notes...",
-    "Quickly access your saved ideas...",
-  ];
- 
-  
+  "Search your notes...",
+  "Looking for something specific?",
+  "Type keywords to find notes...",
+  "Filter notes by title or content...",
+  "Find a note by topic or keyword...",
+  "Browse through your saved notes...",
+  "Quickly access your saved ideas...",
+];
+
 const SearchBar = () => {
   const [currentPlaceholderForSearchArea, setCurrentPlaceholderForSearchArea] =
     useState(0);
@@ -54,12 +57,31 @@ const SearchBar = () => {
   const handleSubmit = (e: any) => {
     console.log(e);
   };
-
+  const { theme } = useTheme();
   return (
-    <div>
+    <div className=" flex items-center w-full">
+      <div>
+        {theme === "dark" ? (
+          <Image
+            src={blackLogo}
+            alt="logo"
+            width={500}
+            height={500}
+            className="h-20 w-36 flex-shrink-0 "
+          />
+        ) : (
+          <Image
+            src={whiteLogo}
+            alt="logo"
+            width={500}
+            height={500}
+            className="h-20 w-36 flex-shrink-0 "
+          />
+        )}
+      </div>
       <MyFormWrapper
         onSubmit={handleSubmit}
-        className="flex flex-col gap-3 mt-8 mb-4 "
+        className="flex flex-col gap-3 mt-8 mb-4 w-full "
       >
         <div className="w-full max-w-2xl mx-auto relative">
           <MyFormInputAceternity

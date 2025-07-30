@@ -1,95 +1,124 @@
-'use client';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
 
-// import {
-//   FileUploader,
-//   FileInput,
-//   FileUploaderContent,
-//   FileUploaderItem,
-// } from '@/components/file-upload';
-import Image from 'next/image';
-import { useState } from 'react';
-import { DropzoneOptions } from 'react-dropzone';
-import {   FileUploader,
-      FileInput,
-      FileUploaderContent,
-      FileUploaderItem,
-     } from '../file-upload';
-import { GrGallery } from 'react-icons/gr';
+import { PlusOutlined } from "@ant-design/icons";
+import type { GetProp, UploadFile, UploadProps } from "antd";
+import { Upload, Modal } from "antd";
+import type { UploadFileStatus } from "antd/es/upload/interface";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+
+type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
+
+const getBase64 = (file: FileType): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (error) => reject(error);
+  });
+
+export interface FileUploadDropzoneProps {
+  onFilesSelected: (files: File[]) => void;
+  maxFiles?: number;
+  maxSizeMB?: number;
+}
 
 const FileUploadDropzone = () => {
-  const [files, setFiles] = useState<File[] | null>([]);
+  const [files, setFiles] = useState<UploadFile[]>([]);
 
+  // Pass selected files up when they change
+  // useEffect(() => {
+  //   onFilesSelected(files);
+  // }, [files, onFilesSelected]);
 
-  const dropzone = {
-    accept: {
-      'image/*': ['.jpg', '.jpeg', '.png'],
-    },
-    multiple: true,
-    maxFiles: 4,
-    maxSize: 1 * 1024 * 1024,
-  } satisfies DropzoneOptions;
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewImage, setPreviewImage] = useState("");
+  const [fileList, setFileList] = useState<any[]>([]);
+
+  const handlePreview = async (file: UploadFile) => {
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj as FileType);
+    }
+
+    setPreviewImage(file.url || (file.preview as string));
+    setPreviewOpen(true);
+  };
+
+  const handleChange: UploadProps["onChange"] = ({ fileList: newFileList }) =>
+    setFileList(newFileList);
+
+  const uploadButton = (
+    <button
+      style={{ border: 0, background: "none" }}
+      className="dark:text-white"
+      type="button"
+    >
+      <PlusOutlined />
+      <div style={{ marginTop: 4 }}>Image</div>
+    </button>
+  );
+
+  useEffect(() => {
+    const selectedFiles = fileList.map((file, index) => ({
+      uid: index.toString(),
+      name: file.name,
+      status: "done" as UploadFileStatus,
+      url: file.originFileObj
+        ? URL.createObjectURL(file.originFileObj as File)
+        : undefined,
+      originFileObj: file.originFileObj ?? file,
+    }));
+
+    setFiles(selectedFiles);
+  }, [fileList]);
 
   return (
-    <div
-      className={`${
-        files?.length == 0 && 'flex gap-0'
-      } relative  bg-background rounded-md   p-2 mx-auto`}
-    >
-      <FileUploader
-        value={files}
-        orientation='vertical'
-        onValueChange={setFiles}
-        className='w-fit pr-3'
-        dropzoneOptions={dropzone}
+    <>
+      <Upload
+        // action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
+
+        listType="picture-card"
+        accept="image/*"
+        fileList={files}
+        onRemove={(file) => {
+          setFileList((prev) => prev.filter((f) => f.uid !== file.uid));
+          setFiles((prev) => prev.filter((f) => f.name !== file.name));
+        }}
+        onPreview={handlePreview}
+        onChange={handleChange}
       >
-        {files?.length === 0 ? (
-          // Layout when no files are present
-          <div className='flex items-center gap-2'>
-            <FileInput
-              className='  text-background rounded-md w-fit'
-              parentclass='w-fit'
-            >
-            <GrGallery size={18} className="cursor-pointer"/>
-              <span className='sr-only'>Select your files</span>
-            </FileInput>
-          </div>
-        ) : (
-          // Layout when files are present
-          <div className='flex flex-col gap-2 mb-2'>
-            <div className='flex items-center gap-2 '>
-              <FileInput
-                className=' border-primary/20 border h-10 w-10 rounded-md flex justify-center items-center'
-                parentclass='w-fit'
-              >
-          
-              <GrGallery size={30} className=""/>
-              </FileInput>
-              <FileUploaderContent className='flex items-start flex-row gap-1'>
-                {files?.map((file, i) => (
-                  <FileUploaderItem
-                    key={i}
-                    index={i}
-                    className='size-12 w-fit p-0 rounded-md overflow-hidden border'
-                    aria-roledescription={`file ${i + 1} containing ${
-                      file.name
-                    }`}
-                  >
-                    <Image
-                      src={URL.createObjectURL(file)}
-                      alt={file.name}
-                      height={80}
-                      width={80}
-                      className='size-12 rounded-md object-cover bg-primary'
-                    />
-                  </FileUploaderItem>
-                ))}
-              </FileUploaderContent>
-            </div>
-          </div>
+        {fileList.length >= 5 ? null : uploadButton}
+      </Upload>
+      <Modal
+        open={previewOpen}
+        title="Image Preview"
+        footer={null}
+        onCancel={() => setPreviewOpen(false)}
+        // width="80vw"
+        // style={{ maxWidth: '90vw' }}
+        bodyStyle={{ 
+          padding: 16,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}
+      >
+        {previewImage && (
+          <Image
+            alt=""
+            src={previewImage}
+            width={600}
+            height={400}
+            style={{
+              maxWidth: "100%",
+              maxHeight: "70vh",
+              objectFit: "contain",
+            }}
+          />
         )}
-      </FileUploader>
-    
-    </div>
+      </Modal>
+    </>
   );
 };
 
