@@ -1,13 +1,30 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React from "react";
-import { Tooltip, message, Form } from "antd";
-import { IconCategory, IconFolder, IconHeart, IconStar, IconHistory, IconShare, IconArchive, IconTrash } from "@tabler/icons-react";
+import { Tooltip, message, Form, Radio, Input } from "antd";
+import {
+  IconCategory,
+  IconFolder,
+  IconHeart,
+  IconStar,
+  IconHistory,
+  IconShare,
+  IconArchive,
+  IconTrash,
+} from "@tabler/icons-react";
 import { MdPersonAddAlt } from "react-icons/md";
 import { motion } from "framer-motion";
 import FileUploadDropzone from "../FileUploadDropzone/FileUploadDropzone";
-import { CategoriesModal, FileListModal, SharedFilesModal, PeopleModal } from "./ModalComponents";
+import {
+  CategoriesModal,
+  FileListModal,
+  SharedFilesModal,
+  PeopleModal,
+} from "./ModalComponents";
+import { Modal, ModalBody, ModalContent, ModalHeader } from "@heroui/react";
+import { Controller, useFormContext } from "react-hook-form";
 
 interface FileItem {
   id: string;
@@ -44,6 +61,7 @@ export default function BottomBar({ inputValue }: { inputValue: string }) {
   const [isArchiveModalOpen, setIsArchiveModalOpen] = React.useState(false);
   const [isTrashModalOpen, setIsTrashModalOpen] = React.useState(false);
   const [isPersonModalOpen, setIsPersonModalOpen] = React.useState(false);
+  const [isSubmitButtonModalOpen, setIsSubmitButtonModalOpen] = React.useState(false);
 
   // Forms
   const [personForm] = Form.useForm();
@@ -127,26 +145,43 @@ export default function BottomBar({ inputValue }: { inputValue: string }) {
     },
   ]);
 
-  const [categories] = React.useState(["Documents", "Finance", "Reports", "Projects", "Marketing", "HR", "Legal", "Operations"]);
+  const [categories] = React.useState([
+    "Documents",
+    "Finance",
+    "Reports",
+    "Projects",
+    "Marketing",
+    "HR",
+    "Legal",
+    "Operations",
+  ]);
 
   // File operations
   const toggleFavorite = (file: FileItem) => {
-    setFiles((prev) => prev.map((f) => (f.id === file.id ? { ...f, isFavorite: !f.isFavorite } : f)));
+    setFiles((prev) =>
+      prev.map((f) => (f.id === file.id ? { ...f, isFavorite: !f.isFavorite } : f))
+    );
     message.success("File favorite status updated");
   };
 
   const toggleStar = (file: FileItem) => {
-    setFiles((prev) => prev.map((f) => (f.id === file.id ? { ...f, isStarred: !f.isStarred } : f)));
+    setFiles((prev) =>
+      prev.map((f) => (f.id === file.id ? { ...f, isStarred: !f.isStarred } : f))
+    );
     message.success("File star status updated");
   };
 
   const moveToTrash = (file: FileItem) => {
-    setFiles((prev) => prev.map((f) => (f.id === file.id ? { ...f, isDeleted: true } : f)));
+    setFiles((prev) =>
+      prev.map((f) => (f.id === file.id ? { ...f, isDeleted: true } : f))
+    );
     message.success("File moved to trash");
   };
 
   const restoreFile = (file: FileItem) => {
-    setFiles((prev) => prev.map((f) => (f.id === file.id ? { ...f, isDeleted: false } : f)));
+    setFiles((prev) =>
+      prev.map((f) => (f.id === file.id ? { ...f, isDeleted: false } : f))
+    );
     message.success("File restored");
   };
 
@@ -156,11 +191,15 @@ export default function BottomBar({ inputValue }: { inputValue: string }) {
   };
 
   const archiveFile = (file: FileItem) => {
-    setFiles((prev) => prev.map((f) => (f.id === file.id ? { ...f, isArchived: !f.isArchived } : f)));
+    setFiles((prev) =>
+      prev.map((f) => (f.id === file.id ? { ...f, isArchived: !f.isArchived } : f))
+    );
     message.success("File archive status updated");
   };
 
-  // File lists
+  const { control, watch, trigger, formState: { isValid }, handleSubmit } = useFormContext();
+  const passwordOption = watch("passwordOption");
+
   const myFiles = files.filter((file) => !file.isDeleted);
   const favoriteFiles = files.filter((file) => file.isFavorite && !file.isDeleted);
   const starredFiles = files.filter((file) => file.isStarred && !file.isDeleted);
@@ -172,7 +211,6 @@ export default function BottomBar({ inputValue }: { inputValue: string }) {
   const archivedFiles = files.filter((file) => file.isArchived && !file.isDeleted);
   const trashedFiles = files.filter((file) => file.isDeleted);
 
-  // File actions object
   const fileActions = {
     onToggleFavorite: toggleFavorite,
     onToggleStar: toggleStar,
@@ -182,7 +220,6 @@ export default function BottomBar({ inputValue }: { inputValue: string }) {
     onDeletePermanently: deleteFilePermanently,
   };
 
-  // Handlers for each action
   const handleCategoriesClick = () => setIsCategoriesModalOpen(true);
   const handleMyFilesClick = () => setIsMyFilesModalOpen(true);
   const handleFavoritesClick = () => setIsFavoritesModalOpen(true);
@@ -192,12 +229,6 @@ export default function BottomBar({ inputValue }: { inputValue: string }) {
   const handleArchiveClick = () => setIsArchiveModalOpen(true);
   const handleTrashClick = () => setIsTrashModalOpen(true);
   const handleAddPersonClick = () => setIsPersonModalOpen(true);
-
-  const handleSubmit = () => {
-    if (inputValue) {
-      message.success(`Submitted: ${inputValue}`);
-    }
-  };
 
   const handleAddPerson = (values: any) => {
     const newPerson: Person = {
@@ -219,54 +250,111 @@ export default function BottomBar({ inputValue }: { inputValue: string }) {
     message.success("Person removed successfully!");
   };
 
+  // Validate before showing modal
+  const handleSubmitClick = async () => {
+    const isFormValid = await trigger();
+    if (!isFormValid) {
+      message.error("Please fill in all required fields");
+      return;
+    }
+    setIsSubmitButtonModalOpen(true);
+  };
+
+  // Final submit calling React Hook Form's handleSubmit
+  const onSubmit = (data: any) => {
+    console.log("Final submitted data:", data);
+    message.success("Form submitted successfully!");
+    setIsSubmitButtonModalOpen(false);
+  };
+
+  const handleFinalSubmit = () => {
+    handleSubmit(onSubmit)();
+  };
+
   return (
     <>
-      <div className="flex items-center justify-between flex-wrap px-4">
+      <div className="flex items-center justify-between flex-wrap px-4 pb-4">
         <div className="flex items-center gap-5 flex-wrap">
-          <FileUploadDropzone />
+          <FileUploadDropzone name="fileUpload" />
 
           <Tooltip title="Categories">
-            <IconCategory size={22} className="cursor-pointer hover:text-blue-500 transition-colors" onClick={handleCategoriesClick} />
+            <IconCategory
+              size={22}
+              className="cursor-pointer hover:text-blue-500 transition-colors"
+              onClick={handleCategoriesClick}
+            />
           </Tooltip>
 
           <Tooltip title="My Files">
-            <IconFolder size={22} className="cursor-pointer hover:text-blue-500 transition-colors" onClick={handleMyFilesClick} />
+            <IconFolder
+              size={22}
+              className="cursor-pointer hover:text-blue-500 transition-colors"
+              onClick={handleMyFilesClick}
+            />
           </Tooltip>
 
           <Tooltip title="Favorites">
-            <IconHeart size={22} className="cursor-pointer hover:text-red-500 transition-colors" onClick={handleFavoritesClick} />
+            <IconHeart
+              size={22}
+              className="cursor-pointer hover:text-red-500 transition-colors"
+              onClick={handleFavoritesClick}
+            />
           </Tooltip>
 
           <Tooltip title="Starred">
-            <IconStar size={22} className="cursor-pointer hover:text-yellow-500 transition-colors" onClick={handleStarredClick} />
+            <IconStar
+              size={22}
+              className="cursor-pointer hover:text-yellow-500 transition-colors"
+              onClick={handleStarredClick}
+            />
           </Tooltip>
 
           <Tooltip title="Recent">
-            <IconHistory size={22} className="cursor-pointer hover:text-green-500 transition-colors" onClick={handleRecentClick} />
+            <IconHistory
+              size={22}
+              className="cursor-pointer hover:text-green-500 transition-colors"
+              onClick={handleRecentClick}
+            />
           </Tooltip>
 
           <Tooltip title="Shared">
-            <IconShare size={22} className="cursor-pointer hover:text-purple-500 transition-colors" onClick={handleSharedClick} />
+            <IconShare
+              size={22}
+              className="cursor-pointer hover:text-purple-500 transition-colors"
+              onClick={handleSharedClick}
+            />
           </Tooltip>
 
           <Tooltip title="Archive">
-            <IconArchive size={22} className="cursor-pointer hover:text-orange-500 transition-colors" onClick={handleArchiveClick} />
+            <IconArchive
+              size={22}
+              className="cursor-pointer hover:text-orange-500 transition-colors"
+              onClick={handleArchiveClick}
+            />
           </Tooltip>
 
           <Tooltip title="Trash">
-            <IconTrash size={22} className="cursor-pointer hover:text-red-500 transition-colors" onClick={handleTrashClick} />
+            <IconTrash
+              size={22}
+              className="cursor-pointer hover:text-red-500 transition-colors"
+              onClick={handleTrashClick}
+            />
           </Tooltip>
 
           <Tooltip title="Manage People">
-            <MdPersonAddAlt size={22} className="cursor-pointer hover:text-blue-500 transition-colors" onClick={handleAddPersonClick} />
+            <MdPersonAddAlt
+              size={22}
+              className="cursor-pointer hover:text-blue-500 transition-colors"
+              onClick={handleAddPersonClick}
+            />
           </Tooltip>
         </div>
 
-        <Tooltip title="Submit">
+        <Tooltip title="Submit Form">
           <button
             disabled={!inputValue}
             type="button"
-            onClick={handleSubmit}
+            onClick={handleSubmitClick}
             className="z-50 h-8 w-8 rounded-full disabled:bg-gray-100 bg-black dark:bg-zinc-900 dark:disabled:bg-zinc-800 transition duration-200 flex items-center justify-center hover:scale-105"
           >
             <motion.svg
@@ -293,10 +381,85 @@ export default function BottomBar({ inputValue }: { inputValue: string }) {
             </motion.svg>
           </button>
         </Tooltip>
+
+        {/* Password Options Modal */}
+        <Modal
+          isOpen={isSubmitButtonModalOpen}
+          onClose={() => setIsSubmitButtonModalOpen(false)}
+        >
+          <ModalContent>
+            <ModalHeader>
+              <h2 className="text-xl font-semibold">Password Options</h2>
+            </ModalHeader>
+            <ModalBody>
+              <Form layout="vertical">
+                <Form.Item>
+                  <Controller
+                    name="passwordOption"
+                    control={control}
+                    defaultValue="none"
+                    render={({ field }) => (
+                      <Radio.Group {...field} className="flex flex-col space-y-2">
+                        <Radio value="none">Don&apos;t need to set password</Radio>
+                        <Radio value="useSaved">Use saved password</Radio>
+                        <Radio value="setNew">Set a new password for this note</Radio>
+                      </Radio.Group>
+                    )}
+                  />
+                </Form.Item>
+
+                {passwordOption === "setNew" && (
+                  <Form.Item label="New Password">
+                    <Controller
+                      name="newPassword"
+                      control={control}
+                      rules={{
+                        validate: (value) =>
+                          passwordOption === "setNew" && !value
+                            ? "Please enter a password."
+                            : true,
+                      }}
+                      render={({ field, fieldState: { error } }) => (
+                        <>
+                          <Input.Password {...field} placeholder="Enter new password" />
+                          {error && (
+                            <p className="text-red-500 text-sm mt-1">{error.message}</p>
+                          )}
+                        </>
+                      )}
+                    />
+                  </Form.Item>
+                )}
+
+                <div className="flex gap-2 mt-4">
+                  <button
+                    type="button"
+                    onClick={() => setIsSubmitButtonModalOpen(false)}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleFinalSubmit}
+                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  >
+                    Confirm & Submit
+                  </button>
+                </div>
+              </Form>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
       </div>
 
-      {/* Modal Components */}
-      <CategoriesModal isOpen={isCategoriesModalOpen} onClose={() => setIsCategoriesModalOpen(false)} categories={categories} files={files} />
+      {/* Existing Modals */}
+      <CategoriesModal
+        isOpen={isCategoriesModalOpen}
+        onClose={() => setIsCategoriesModalOpen(false)}
+        categories={categories}
+        files={files}
+      />
 
       <FileListModal
         isOpen={isMyFilesModalOpen}
@@ -330,7 +493,12 @@ export default function BottomBar({ inputValue }: { inputValue: string }) {
         fileActions={fileActions}
       />
 
-      <SharedFilesModal isOpen={isSharedModalOpen} onClose={() => setIsSharedModalOpen(false)} files={sharedFiles} fileActions={fileActions} />
+      <SharedFilesModal
+        isOpen={isSharedModalOpen}
+        onClose={() => setIsSharedModalOpen(false)}
+        files={sharedFiles}
+        fileActions={fileActions}
+      />
 
       <FileListModal
         isOpen={isArchiveModalOpen}

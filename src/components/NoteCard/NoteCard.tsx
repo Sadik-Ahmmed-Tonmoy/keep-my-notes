@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
-import { TbEdit } from "react-icons/tb";
-import { MdOutlineDelete } from "react-icons/md";
 import { Tooltip } from "@nextui-org/react";
-import Swal from "sweetalert2";
 import { FaRegStar } from "react-icons/fa";
+import { MdOutlineDelete } from "react-icons/md";
+import { TbEdit } from "react-icons/tb";
+import Swal from "sweetalert2";
+import ViewModal from "./ViewModal";
 
 const NoteCard = () => {
   const [showArticle, setShowArticle] = useState(false);
@@ -71,8 +72,8 @@ const NoteCard = () => {
         <div className="text-base text-white font-normal pt-8 flex gap-1 transition-all duration-300">
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center gap-3">
+              <ViewModal />
               <Tooltip
-             
                 placement="top"
                 content="Edit"
                 classNames={{
@@ -89,7 +90,6 @@ const NoteCard = () => {
                 <TbEdit size={20} onClick={handleEdit} />
               </Tooltip>
               <Tooltip
-              
                 placement="top"
                 content="Delete"
                 classNames={{

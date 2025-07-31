@@ -1,24 +1,32 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import { Modal, ModalBody, ModalContent, ModalHeader } from "@heroui/react";
 import {
-    Modal,
-    ModalBody,
-    ModalContent,
-    ModalHeader,
-} from "@heroui/react";
-import {
-    IconArchive,
-    IconDownload,
-    IconEdit,
-    IconEye,
-    IconHeart,
-    IconStar,
-    IconTrash,
-    IconX,
+  IconArchive,
+  IconDownload,
+  IconEdit,
+  IconEye,
+  IconHeart,
+  IconStar,
+  IconTrash,
+  IconX,
 } from "@tabler/icons-react";
-import { Button as AntButton, DatePicker, Form, Input, List, Popconfirm, Select, Space, Tag, Tooltip } from "antd";
+import {
+  Button as AntButton,
+  DatePicker,
+  Form,
+  Input,
+  List,
+  Popconfirm,
+  Radio,
+  Select,
+  Space,
+  Tag,
+  Tooltip,
+} from "antd";
 import React from "react";
+import { Controller, useFormContext } from "react-hook-form";
 
 interface FileItem {
   id: string;
@@ -74,45 +82,57 @@ export const FileActions: React.FC<FileActionsProps> = ({
     <Tooltip title="Edit">
       <IconEdit size={16} className="cursor-pointer text-orange-500" />
     </Tooltip>
-    <Tooltip title={file.isFavorite ? "Remove from favorites" : "Add to favorites"}>
-      <IconHeart 
-        size={16} 
-        className={`cursor-pointer ${file.isFavorite ? 'text-red-500 fill-current' : 'text-gray-500'}`}
+    <Tooltip
+      title={file.isFavorite ? "Remove from favorites" : "Add to favorites"}
+    >
+      <IconHeart
+        size={16}
+        className={`cursor-pointer ${
+          file.isFavorite ? "text-red-500 fill-current" : "text-gray-500"
+        }`}
         onClick={() => onToggleFavorite(file.id)}
       />
     </Tooltip>
     <Tooltip title={file.isStarred ? "Unstar" : "Star"}>
-      <IconStar 
-        size={16} 
-        className={`cursor-pointer ${file.isStarred ? 'text-yellow-500 fill-current' : 'text-gray-500'}`}
+      <IconStar
+        size={16}
+        className={`cursor-pointer ${
+          file.isStarred ? "text-yellow-500 fill-current" : "text-gray-500"
+        }`}
         onClick={() => onToggleStar(file.id)}
       />
     </Tooltip>
     {!file.isDeleted && (
       <Tooltip title={file.isArchived ? "Unarchive" : "Archive"}>
-        <IconArchive 
-          size={16} 
-          className={`cursor-pointer ${file.isArchived ? 'text-blue-500' : 'text-gray-500'}`}
+        <IconArchive
+          size={16}
+          className={`cursor-pointer ${
+            file.isArchived ? "text-blue-500" : "text-gray-500"
+          }`}
           onClick={() => onArchiveFile(file.id)}
         />
       </Tooltip>
     )}
     {file.isDeleted ? (
       <>
-        <AntButton size="small" onClick={() => onRestoreFile(file.id)}>Restore</AntButton>
+        <AntButton size="small" onClick={() => onRestoreFile(file.id)}>
+          Restore
+        </AntButton>
         <Popconfirm
           title="Permanently delete this file?"
           onConfirm={() => onDeletePermanently(file.id)}
           okText="Delete"
           cancelText="Cancel"
         >
-          <AntButton size="small" danger>Delete Forever</AntButton>
+          <AntButton size="small" danger>
+            Delete Forever
+          </AntButton>
         </Popconfirm>
       </>
     ) : (
       <Tooltip title="Move to trash">
-        <IconTrash 
-          size={16} 
+        <IconTrash
+          size={16}
           className="cursor-pointer text-red-500"
           onClick={() => onMoveToTrash(file.id)}
         />
@@ -135,20 +155,17 @@ export const CategoriesModal: React.FC<CategoriesModalProps> = ({
   categories,
   files,
 }) => (
-  <Modal
-    isOpen={isOpen}
-    onClose={onClose}
-    size="2xl"
-    scrollBehavior="inside"
-  >
+  <Modal isOpen={isOpen} onClose={onClose} size="2xl" scrollBehavior="inside">
     <ModalContent>
       <ModalHeader>
         <h2 className="text-xl font-semibold">File Categories</h2>
       </ModalHeader>
       <ModalBody>
         <div className="space-y-4">
-          {categories.map(category => {
-            const categoryFiles = files.filter(file => file.category === category && !file.isDeleted);
+          {categories.map((category) => {
+            const categoryFiles = files.filter(
+              (file) => file.category === category && !file.isDeleted
+            );
             return (
               <div key={category} className="border rounded-lg p-4">
                 <div className="flex justify-between items-center mb-2">
@@ -156,8 +173,12 @@ export const CategoriesModal: React.FC<CategoriesModalProps> = ({
                   <Tag color="blue">{categoryFiles.length} files</Tag>
                 </div>
                 <div className="text-sm text-gray-600">
-                  {categoryFiles.slice(0, 3).map(file => file.name).join(", ")}
-                  {categoryFiles.length > 3 && ` and ${categoryFiles.length - 3} more...`}
+                  {categoryFiles
+                    .slice(0, 3)
+                    .map((file) => file.name)
+                    .join(", ")}
+                  {categoryFiles.length > 3 &&
+                    ` and ${categoryFiles.length - 3} more...`}
                 </div>
               </div>
             );
@@ -174,7 +195,7 @@ interface FileListModalProps {
   onClose: () => void;
   title: string;
   files: FileItem[];
-  fileActions: any
+  fileActions: any;
 }
 
 export const FileListModal: React.FC<FileListModalProps> = ({
@@ -184,15 +205,12 @@ export const FileListModal: React.FC<FileListModalProps> = ({
   files,
   fileActions,
 }) => (
-  <Modal
-    isOpen={isOpen}
-    onClose={onClose}
-    size="3xl"
-    scrollBehavior="inside"
-  >
+  <Modal isOpen={isOpen} onClose={onClose} size="3xl" scrollBehavior="inside">
     <ModalContent>
       <ModalHeader>
-        <h2 className="text-xl font-semibold">{title} ({files.length})</h2>
+        <h2 className="text-xl font-semibold">
+          {title} ({files.length})
+        </h2>
       </ModalHeader>
       <ModalBody>
         <List
@@ -200,24 +218,29 @@ export const FileListModal: React.FC<FileListModalProps> = ({
           renderItem={(file) => (
             <List.Item
               actions={[
-                <FileActions 
-                  key="actions" 
-                  file={file} 
+                <FileActions
+                  key="actions"
+                  file={file}
                   onToggleFavorite={fileActions.onToggleFavorite}
                   onToggleStar={fileActions.onToggleStar}
                   onArchiveFile={fileActions.onArchiveFile}
                   onMoveToTrash={fileActions.onMoveToTrash}
                   onRestoreFile={fileActions.onRestoreFile}
                   onDeletePermanently={fileActions.onDeletePermanently}
-                />
+                />,
               ]}
             >
               <List.Item.Meta
                 title={
-                  <span className={`font-medium ${
-                    file.isDeleted ? 'text-red-600 line-through' : 
-                    file.isArchived ? 'text-gray-600' : ''
-                  }`}>
+                  <span
+                    className={`font-medium ${
+                      file.isDeleted
+                        ? "text-red-600 line-through"
+                        : file.isArchived
+                        ? "text-gray-600"
+                        : ""
+                    }`}
+                  >
                     {file.name}
                   </span>
                 }
@@ -226,11 +249,14 @@ export const FileListModal: React.FC<FileListModalProps> = ({
                     <Tag color="blue">{file.type}</Tag>
                     <span>{file.size}</span>
                     <span>
-                      {file.isDeleted ? 'Deleted' : 'Modified'}: {file.dateModified}
+                      {file.isDeleted ? "Deleted" : "Modified"}:{" "}
+                      {file.dateModified}
                     </span>
                     <Tag color="green">{file.category}</Tag>
                     {file.sharedWith.length > 0 && (
-                      <Tag color="purple">Shared with {file.sharedWith.length}</Tag>
+                      <Tag color="purple">
+                        Shared with {file.sharedWith.length}
+                      </Tag>
                     )}
                     {file.isArchived && <Tag color="orange">Archived</Tag>}
                     {file.isDeleted && <Tag color="red">Deleted</Tag>}
@@ -259,12 +285,7 @@ export const SharedFilesModal: React.FC<SharedFilesModalProps> = ({
   files,
   fileActions,
 }) => (
-  <Modal
-    isOpen={isOpen}
-    onClose={onClose}
-    size="3xl"
-    scrollBehavior="inside"
-  >
+  <Modal isOpen={isOpen} onClose={onClose} size="3xl" scrollBehavior="inside">
     <ModalContent>
       <ModalHeader>
         <h2 className="text-xl font-semibold">Shared Files ({files.length})</h2>
@@ -275,16 +296,16 @@ export const SharedFilesModal: React.FC<SharedFilesModalProps> = ({
           renderItem={(file) => (
             <List.Item
               actions={[
-                <FileActions 
-                  key="actions" 
-                  file={file} 
+                <FileActions
+                  key="actions"
+                  file={file}
                   onToggleFavorite={fileActions.onToggleFavorite}
                   onToggleStar={fileActions.onToggleStar}
                   onArchiveFile={fileActions.onArchiveFile}
                   onMoveToTrash={fileActions.onMoveToTrash}
                   onRestoreFile={fileActions.onRestoreFile}
                   onDeletePermanently={fileActions.onDeletePermanently}
-                />
+                />,
               ]}
             >
               <List.Item.Meta
@@ -298,9 +319,13 @@ export const SharedFilesModal: React.FC<SharedFilesModalProps> = ({
                       <Tag color="green">{file.category}</Tag>
                     </Space>
                     <div>
-                      <span className="text-sm text-gray-600">Shared with: </span>
-                      {file.sharedWith.map(email => (
-                        <Tag key={email} color="purple">{email}</Tag>
+                      <span className="text-sm text-gray-600">
+                        Shared with:{" "}
+                      </span>
+                      {file.sharedWith.map((email) => (
+                        <Tag key={email} color="purple">
+                          {email}
+                        </Tag>
                       ))}
                     </div>
                   </Space>
@@ -332,12 +357,7 @@ export const PeopleModal: React.FC<PeopleModalProps> = ({
   onRemovePerson,
   form,
 }) => (
-  <Modal
-    isOpen={isOpen}
-    onClose={onClose}
-    size="3xl"
-    scrollBehavior="inside"
-  >
+  <Modal isOpen={isOpen} onClose={onClose} size="3xl" scrollBehavior="inside">
     <ModalContent>
       <ModalHeader>
         <h2 className="text-xl font-semibold">Manage People</h2>
@@ -355,7 +375,7 @@ export const PeopleModal: React.FC<PeopleModalProps> = ({
               <Form.Item
                 label="Full Name"
                 name="name"
-                rules={[{ required: true, message: 'Please enter full name' }]}
+                rules={[{ required: true, message: "Please enter full name" }]}
               >
                 <Input placeholder="Enter full name" />
               </Form.Item>
@@ -363,8 +383,8 @@ export const PeopleModal: React.FC<PeopleModalProps> = ({
                 label="Email"
                 name="email"
                 rules={[
-                  { required: true, message: 'Please enter email' },
-                  { type: 'email', message: 'Please enter valid email' }
+                  { required: true, message: "Please enter email" },
+                  { type: "email", message: "Please enter valid email" },
                 ]}
               >
                 <Input placeholder="Enter email address" />
@@ -372,7 +392,7 @@ export const PeopleModal: React.FC<PeopleModalProps> = ({
               <Form.Item
                 label="Role"
                 name="role"
-                rules={[{ required: true, message: 'Please select role' }]}
+                rules={[{ required: true, message: "Please select role" }]}
               >
                 <Select placeholder="Select role">
                   <Select.Option value="Manager">Manager</Select.Option>
@@ -385,7 +405,9 @@ export const PeopleModal: React.FC<PeopleModalProps> = ({
               <Form.Item
                 label="Department"
                 name="department"
-                rules={[{ required: true, message: 'Please select department' }]}
+                rules={[
+                  { required: true, message: "Please select department" },
+                ]}
               >
                 <Select placeholder="Select department">
                   <Select.Option value="Engineering">Engineering</Select.Option>
@@ -400,7 +422,7 @@ export const PeopleModal: React.FC<PeopleModalProps> = ({
             <Form.Item
               label="Join Date"
               name="joinDate"
-              rules={[{ required: true, message: 'Please select join date' }]}
+              rules={[{ required: true, message: "Please select join date" }]}
             >
               <DatePicker className="w-full" />
             </Form.Item>
@@ -412,7 +434,9 @@ export const PeopleModal: React.FC<PeopleModalProps> = ({
           </Form>
 
           <div>
-            <h3 className="text-lg font-semibold mb-4">Team Members ({people.length})</h3>
+            <h3 className="text-lg font-semibold mb-4">
+              Team Members ({people.length})
+            </h3>
             <List
               dataSource={people}
               renderItem={(person) => (
@@ -428,7 +452,7 @@ export const PeopleModal: React.FC<PeopleModalProps> = ({
                       <AntButton size="small" danger type="text">
                         <IconX size={16} />
                       </AntButton>
-                    </Popconfirm>
+                    </Popconfirm>,
                   ]}
                 >
                   <List.Item.Meta
@@ -455,3 +479,70 @@ export const PeopleModal: React.FC<PeopleModalProps> = ({
     </ModalContent>
   </Modal>
 );
+
+export const SubmitButtonModal: React.FC<any> = ({
+  isOpen,
+  onClose,
+}) => {
+  const { control, watch } = useFormContext();
+  const passwordOption = watch("passwordOption");
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+    >
+      <ModalContent>
+        <ModalHeader>
+          <h2 className="text-xl font-semibold">Password Options</h2>
+        </ModalHeader>
+        <ModalBody>
+          <Form layout="vertical">
+            <Form.Item>
+              <Controller
+                name="passwordOption"
+                control={control}
+                render={({ field }) => (
+                  <Radio.Group {...field} className="flex flex-col space-y-2">
+                    <Radio value="none">Don’t need to set password</Radio>
+                    <Radio value="useSaved">Use saved password</Radio>
+                    <Radio value="setNew">Set a new password for this note</Radio>
+                  </Radio.Group>
+                )}
+              />
+            </Form.Item>
+
+            {passwordOption === "setNew" && (
+              <Form.Item label="New Password">
+                <Controller
+                  name="newPassword"
+                  control={control}
+                  rules={{
+                    validate: (value) =>
+                      passwordOption === "setNew" && !value
+                        ? "Please enter a password."
+                        : true,
+                  }}
+                  render={({ field, fieldState: { error } }) => (
+                    <>
+                      <Input.Password {...field} placeholder="Enter new password" />
+                      {error && (
+                        <p className="text-red-500 text-sm mt-1">
+                          {error.message}
+                        </p>
+                      )}
+                    </>
+                  )}
+                />
+              </Form.Item>
+            )}
+         
+              <button type="submit"  className="w-full">
+                Confirm
+              </button>
+         
+          </Form>
+        </ModalBody>
+      </ModalContent>
+    </Modal>
+  );
+};

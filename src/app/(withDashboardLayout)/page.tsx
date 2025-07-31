@@ -5,9 +5,7 @@ import NoteCard from "@/components/NoteCard/NoteCard";
 import SearchBar from "@/components/SearchBar/SearchBar";
 import { NoteFormWithVanishEffect } from "@/components/ui/NoteFormWithVanishEffect/NoteFormWithVanishEffect";
 import { motion } from "framer-motion";
-import { IoCheckmarkCircleOutline } from "react-icons/io5";
-import { toast, Toaster } from "sonner";
-
+import { Toaster } from "sonner";
 
 const MainPage = () => {
   const placeholders = [
@@ -30,18 +28,6 @@ const MainPage = () => {
     "Summarize or recap the key points...", // Guides toward a summary
   ];
 
-  const handleChange = (e: any) => {
-    console.log("Input changed:", e.target.value);
-  };
-
-  const handleSubmit = (e: any) => {
-    console.log(e);
-    toast("Note has been saved", {
-      icon: <IoCheckmarkCircleOutline size={25} />,
-    });
-  };
-
-  
   // Watch the `search` field and update `searchValue`
 
   return (
@@ -53,8 +39,8 @@ const MainPage = () => {
         <NoteFormWithVanishEffect
           placeholders={placeholders}
           placeholdersForTextArea={placeholdersForTextArea}
-          onChange={handleChange}
-          onSubmit={handleSubmit}
+          // onChange={handleChange}
+          // onSubmit={handleSubmit}
         />
       </div>
 

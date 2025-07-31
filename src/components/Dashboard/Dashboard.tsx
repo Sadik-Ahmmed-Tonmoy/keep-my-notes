@@ -99,10 +99,10 @@ export default function SidebarDemo({
 
       <div className="flex flex-col md:flex-row w-full flex-1 mx-auto h-full">
         <div className="  overflow-hidden ">
-          <Sidebar open={open} setOpen={setOpen}>
-            <SidebarBody className="justify-between gap-10">
+          <Sidebar open={open} setOpen={setOpen}  >
+            <SidebarBody className="justify-between gap-10 overflow-hidden overflow-y-auto" >
              
-              <div className="px-6 mt-44">
+              <div className="px-6 md:mt-44 ">
                 {links.map((link, idx) => (
                   <SidebarLink key={idx} link={link} />
                 ))}
