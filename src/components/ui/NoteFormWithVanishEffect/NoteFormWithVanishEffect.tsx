@@ -127,7 +127,7 @@ function PlaceholdersAndVanishInput({
               disabled={isSubmitting}
               aria-label="Note title"
               className={cn(
-                "w-full relative text-sm sm:text-base z-50 border-none dark:text-white bg-transparent text-black h-full rounded-full focus:outline-none focus:ring-0 pl-4 sm:pl-10 pr-20"
+                "w-full relative text-sm sm:text-base z-50 border-none dark:bg-neutral-900 dark:text-white bg-transparent text-black h-full rounded-full focus:outline-none focus:ring-0 pl-4 sm:pl-10 pr-20"
               )}
               size="large"
             />
@@ -179,7 +179,7 @@ function PlaceholdersAndVanishInput({
                 autoSize={{ minRows: 2, maxRows: 8 }}
                 aria-label="Note details"
                 className={cn(
-                  "w-full relative text-sm sm:text-base z-50 border-none dark:text-white bg-transparent text-black focus:outline-none focus:ring-0 pl-4 pt-4 mb-10 sm:pl-10 pr-20 resize-none overflow-hidden"
+                  "w-full relative text-sm sm:text-base z-50 border-none dark:bg-neutral-900 dark:text-white bg-transparent text-black focus:outline-none focus:ring-0 pl-4 pt-4 mb-10 sm:pl-10 pr-20 resize-none overflow-hidden"
                 )}
               />
             )}
@@ -197,7 +197,7 @@ function PlaceholdersAndVanishInput({
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: -15, opacity: 0 }}
                   transition={{ duration: 0.3, ease: "linear" }}
-                  className="dark:text-zinc-500 text-sm sm:text-base font-normal text-neutral-500 pl-4 sm:pl-12 text-left w-[calc(100%-2rem)] truncate"
+                  className="dark:text-red-500 text-sm sm:text-base font-normal text-neutral-500 pl-4 sm:pl-12 text-left w-[calc(100%-2rem)] truncate"
                 >
                   {placeholdersForTextArea[currentPlaceholderForTextArea]}
                 </motion.p>
