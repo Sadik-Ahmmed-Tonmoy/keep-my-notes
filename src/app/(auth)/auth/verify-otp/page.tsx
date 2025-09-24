@@ -1,6 +1,5 @@
-
-import { OtpForm } from "@/components/auth/otp-form"
-import { FileText } from "lucide-react"
+import { OtpForm } from "@/components/auth/otp-form";
+import ThemedLogo from "@/components/auth/ThemedLogo";
 
 export default function VerifyOtpPage() {
   return (
@@ -9,22 +8,19 @@ export default function VerifyOtpPage() {
         {/* Logo Section */}
         <div className="flex items-center justify-center mb-8">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-              <FileText className="w-6 h-6 text-primary-foreground" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-semibold text-foreground">Keep</h1>
-              <p className="text-sm text-muted-foreground -mt-1">MY Notes</p>
-            </div>
+            <ThemedLogo />
           </div>
         </div>
 
         {/* OTP Form Card */}
         <div className="bg-card border border-border rounded-lg shadow-sm p-6">
           <div className="mb-6 text-center">
-            <h2 className="text-xl font-semibold text-foreground mb-2">Verify your email</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-2">
+              Verify your email
+            </h2>
             <p className="text-sm text-muted-foreground">
-              We&apos;ve sent a 6-digit code to your email address. Please enter it below to verify your account.
+              We&apos;ve sent a 6-digit code to your email address. Please enter
+              it below to verify your account.
             </p>
           </div>
 
@@ -34,10 +30,13 @@ export default function VerifyOtpPage() {
         {/* Footer */}
         <div className="mt-6 text-center">
           <p className="text-xs text-muted-foreground">
-            Didn't receive the code? <button className="text-primary hover:underline">Resend code</button>
+            Didn't receive the code?{" "}
+            <button className="text-primary hover:underline">
+              Resend code
+            </button>
           </p>
         </div>
       </div>
     </div>
-  )
+  );
 }
